@@ -1,0 +1,56 @@
+package org.zerock.b01.repository;
+
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
+import org.zerock.b01.domain.Board;
+import org.zerock.b01.domain.Reply;
+
+@SpringBootTest
+@Log4j2
+public class ReplyRepositoryTests {
+
+    @Autowired
+    private ReplyRepository replyRepository;
+
+    @Test
+    public void testInsert(){
+        Long bno = 100L;
+
+        Board board = Board.builder().bno(bno).build();
+
+        Reply reply = Reply.builder()
+                .board(board)
+                //해당 메소드 내에서의 board객체는 bno 필드를 100L로 초기화한 객체이므로,
+                //Reply 객체의 board필드를 해당 board객체로 초기화를 하면 100L bno를 지닌 엔티티를 참조하는 객체가 됨.
+                //bno는 @Id 필드이며, 이는 JPA 엔티티 객체를 구분하는 기준이므로 객체에 해당 필드값은 반드시 설정할 것.
+                .replyText("댓글...")
+                .replyer("replyer1")
+                .build();
+
+
+        replyRepository.save(reply);
+    }
+
+    @Transactional
+    @Test
+    public void testBoardReplies() {
+
+        Long bno = 100L;
+
+        Pageable pageable = PageRequest.of(0,10, Sort.by("rno").descending());
+
+        Page<Reply> result = replyRepository.listOfBoard(bno, pageable);
+
+        result.getContent().forEach(reply -> {
+            log.info(reply);
+        });
+    }
+
+}
