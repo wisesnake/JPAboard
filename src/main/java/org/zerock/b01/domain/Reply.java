@@ -5,7 +5,9 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name = "Reply", indexes={ @Index(name = "idx_reply_board_bno", columnList = "board_bno")})
+@Table(name = "Reply", indexes = {
+        @Index(name = "idx_reply_board_bno", columnList = "board_bno")
+})
 @Getter
 @Builder
 @AllArgsConstructor
@@ -29,6 +31,7 @@ public class Reply extends BaseEntity{
     public void changeText(String text){
         this.replyText = text;
     }
+    //댓글 수정은 내용만 되어야 하므로 setter개념의 메소드 하나 생성해두기.
 
 }
 
