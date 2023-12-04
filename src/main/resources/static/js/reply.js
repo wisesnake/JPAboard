@@ -12,3 +12,27 @@ async function getList({bno,page,size,goLast}){
     return result.data;
 
 }
+
+async function addReply(replyObj) {
+        const response = await axios.post('/replies/',replyObj)
+        //컨트롤러의 해당 호출 메소드의 리턴값은 rno임.
+    return response.data;
+
+}
+
+async function getReply(rno) {
+    const response = await axios.get(`/replies/${rno}`)
+    return response.data
+}
+
+async function modifyReply(replyObj){
+
+    const response = await axios.put(`/replies/${replyObj.rno}`, replyObj)
+    return response.data
+
+}
+
+async function removeReply(rno) {
+    const response = await axios.delete(`/replies/${rno}`)
+    return response.data
+}

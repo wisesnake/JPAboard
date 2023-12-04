@@ -73,6 +73,7 @@
     </div>
     <div class="row mt-3">
         <div class="col">
+            <!--페이징 처리 관련 Event 처리는([ex)페이지네이션 번호 클릭후 페이지이동]) 해당 ul 을 대상으로 할 것-->
             <ul class="pagination replyPaging">
             </ul>
         </div>
@@ -89,16 +90,16 @@
                 <div class="modal-body">
                     <div class="input-group mb-3">
                         <span class="input-group-text">Reply Text</span>
-                        <input type="text" class="form-control replyText" >
+                        <input type="text" class="form-control replyText">
                     </div>
                     <div class="input-group mb-3">
                         <span class="input-group-text">Replyer</span>
-                        <input type="text" class="form-control replyer" >
+                        <input type="text" class="form-control replyer">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary registerBtn">Register</button>
-                    <button type="button" class="btn btn-outline-dark closeRegisterBtn" >Close</button>
+                    <button type="button" class="btn btn-outline-dark closeRegisterBtn">Close</button>
                 </div>
             </div>
         </div>
@@ -115,7 +116,7 @@
                 <div class="modal-body">
                     <div class="input-group mb-3">
                         <span class="input-group-text">Reply Text</span>
-                        <input type="text" class="form-control modifyText" >
+                        <input type="text" class="form-control modifyText">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -142,10 +143,10 @@
     const replyList = document.querySelector('.replyList') //댓글 목록 DOM
     const replyPaging = document.querySelector('.replyPaging') //페이지 목록 DOM
 
-    function printList(dtoList){ //댓글 목록 출력
+    function printList(dtoList) { //댓글 목록 출력
         let str = '';
 
-        if(dtoList && dtoList.length > 0){
+        if (dtoList && dtoList.length > 0) {
 
             for (const dto of dtoList) {
 
@@ -160,29 +161,29 @@
         replyList.innerHTML = str
     }
 
-    function printPages(data){ //페이지 목록 출력
+    function printPages(data) { //페이지 목록 출력
 
         //pagination
         let pageStr = '';
 
-        if(data.prev) {
-            pageStr +=`<li class="page-item"><a class="page-link" data-page="${data.start-1}">PREV</a></li>`
+        if (data.prev) {
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.start - 1}">PREV</a></li>`
         }
 
-        for(let i = data.start; i <= data.end; i++){
-            pageStr +=`<li class="page-item ${i == data.page?"active":""} "><a class="page-link" data-page="${i}">${i}</a></li>`
+        for (let i = data.start; i <= data.end; i++) {
+            pageStr += `<li class="page-item ${i == data.page ? "active" : ""} "><a class="page-link" data-page="${i}">${i}</a></li>`
         }
 
-        if(data.next) {
-            pageStr +=`<li class="page-item"><a class="page-link" data-page="${data.end +1}">NEXT</a></li>`
+        if (data.next) {
+            pageStr += `<li class="page-item"><a class="page-link" data-page="${data.end + 1}">NEXT</a></li>`
         }
         replyPaging.innerHTML = pageStr
     }
 
 
-    function printReplies(page,size,goLast){
+    function printReplies(page, size, goLast) {
 
-        getList({bno, page,size, goLast}).then(
+        getList({bno, page, size, goLast}).then(
             data => {
                 printList(data.dtoList) //목록 처리
                 printPages(data) //페이지 처리
@@ -193,5 +194,136 @@
 
     }
 
-    printReplies(1, 10)
+    printReplies(1, 10, true)
+
+
+    //댓글 등록 모달
+    const registerModal = new bootstrap.Modal(document.querySelector(".registerModal"))
+
+    //registerModal
+    const registerBtn = document.querySelector(".registerBtn")
+    const replyText = document.querySelector(".replyText")
+    const replyer = document.querySelector(".replyer")
+    const closeRegisterBtn = document.querySelector(".closeRegisterBtn")
+
+    document.querySelector(".addReplyBtn").addEventListener("click", function (e) {
+        registerModal.show()
+    }, false)
+
+    closeRegisterBtn.addEventListener("click", function (e) {
+        registerModal.hide()
+    }, false)
+
+    //register 버튼 누를 시 댓글 등록 이벤트 처리
+    registerBtn.addEventListener("click", function (e) {
+        //모달창의 replyText부분과 replyer 부분의 input text 영역에 입력한 value를 JSON형태로 객체에 초기화.
+        const replyObj = {
+            bno: bno,
+            replyText: replyText.value,
+            replyer: replyer.value
+        }
+        //댓글 내용 JSON을 담은 객체를 axios 형식의 메소드 addReply에 보냄.
+        //then 호출 시, alert창에
+        addReply(replyObj).then(result => {
+            alert("댓글이 등록되었습니다.\n debug)등록 댓글 번호 : " + result.rno)
+            registerModal.hide()
+            replyText.value = ''
+            replyer.value = ''
+            printReplies(1, 10, true)
+        }).catch(e => {
+            alert("Exception...")
+        })
+
+    }, false)
+
+    let page = 1
+    let size = 10
+
+    replyPaging.addEventListener("click", function (e) {
+
+        e.preventDefault()
+        e.stopPropagation()
+
+        const target = e.target
+
+        if (!target || target.tagName != 'A') {
+            return
+        }
+
+        const pageNum = target.getAttribute("data-page")
+        page = pageNum
+        printReplies(page, size)
+    }, false)
+
+    //modifyModal
+    const modifyModal = new bootstrap.Modal(document.querySelector(".modifyModal"))
+
+    const replyHeader = document.querySelector(".replyHeader")
+    const modifyText = document.querySelector(".modifyText")
+    const modifyBtn = document.querySelector(".modifyBtn")
+    const removeBtn = document.querySelector(".removeBtn")
+    const closeModifyBtn = document.querySelector(".closeModifyBtn")
+
+    replyList.addEventListener("click", function (e) {
+
+        e.preventDefault()
+        e.stopPropagation()
+
+        const target = e.target
+
+        if (!target || target.tagName != 'SPAN') {
+            return
+        }
+
+        const rno = target.getAttribute("data-rno")
+
+        if (!rno) {
+            return
+        }
+
+        getReply(rno).then(reply => {
+
+            console.log(reply)
+            replyHeader.innerHTML = reply.rno
+            modifyText.value = reply.replyText
+            modifyModal.show()
+
+        }).catch(e => alert('error'))
+
+    }, false)
+
+    modifyBtn.addEventListener("click", function (e) {
+        const replyObj = {
+            bno: bno,
+            rno: replyHeader.innerHTML,
+            //replyList 클릭 시(수정 위해 리플 클릭 시) replyHeader의 innerHTML을 rno로 바꾸므로
+            replyText: modifyText.value
+        }
+
+        modifyReply(replyObj).then(result => {
+            alert(result.rno + `번 댓글이 수정되었습니다.`)
+            replyText.value=''
+            modifyModal.hide()
+            printReplies(page,size)
+            }
+        ).catch(e=>{alert(`error!`)})
+    },false)
+
+    closeModifyBtn.addEventListener("click", function(e){
+        modifyModal.hide()
+    },false)
+
+    removeBtn.addEventListener("click", function(e){
+        const removeRno = replyHeader.innerHTML
+        removeReply(removeRno).then(result =>{
+            alert(`${result.rno} 번 댓글 삭제됨`)
+            replyText.value=''
+            modifyModal.hide()
+
+            page = 1
+
+            printReplies(page,size)
+        }).catch(e=>{alert(`에러발생!`)})
+    },false)
+
 </script>
