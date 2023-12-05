@@ -4,13 +4,25 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import org.zerock.b01.domain.Board;
+import org.zerock.b01.domain.BoardImage;
 import org.zerock.b01.dto.BoardDTO;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.repository.BoardRepository;
+
+import javax.transaction.Transactional;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @SpringBootTest
 @Log4j2
 public class BoardServiceTests {
+
+    @Autowired
+    private BoardRepository boardRepository;
 
     @Autowired
     private BoardService boardService;
@@ -60,7 +72,6 @@ public class BoardServiceTests {
         log.info(responseDTO);
 
     }
-
 
 
 }
