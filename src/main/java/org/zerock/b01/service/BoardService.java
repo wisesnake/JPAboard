@@ -1,9 +1,8 @@
 package org.zerock.b01.service;
 
-import org.zerock.b01.dto.BoardDTO;
-import org.zerock.b01.dto.BoardListReplyCountDTO;
-import org.zerock.b01.dto.PageRequestDTO;
-import org.zerock.b01.dto.PageResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.zerock.b01.dto.*;
 
 public interface BoardService {
 
@@ -19,4 +18,7 @@ public interface BoardService {
 
     //list에서 댓글 숫자까지 처리하는 list
     PageResponseDTO<BoardListReplyCountDTO> listWithReplyCount(PageRequestDTO pageRequestDTO);
+
+    PageResponseDTO<BoardListAllDTO> listWithAll(PageRequestDTO pageRequestDTO);
+
 }
