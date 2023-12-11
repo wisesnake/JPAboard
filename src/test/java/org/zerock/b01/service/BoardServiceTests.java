@@ -7,15 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.zerock.b01.domain.Board;
 import org.zerock.b01.domain.BoardImage;
-import org.zerock.b01.dto.BoardDTO;
-import org.zerock.b01.dto.PageRequestDTO;
-import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.dto.*;
 import org.zerock.b01.repository.BoardRepository;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @SpringBootTest
 @Log4j2
@@ -53,6 +49,8 @@ public class BoardServiceTests {
                 .content("Updated content 101...")
                 .build();
 
+        boardDTO.setFileNames(Arrays.asList(UUID.randomUUID()+"_zzz.jpg"));
+
         boardService.modify(boardDTO);
 
     }
@@ -71,6 +69,71 @@ public class BoardServiceTests {
 
         log.info(responseDTO);
 
+    }
+
+    @Test
+    public void testRegisterWithImages() {
+
+        log.info(boardService.getClass().getName());
+
+        BoardDTO boardDTO = BoardDTO.builder()
+                .title("File...Sample Title...")
+                .content("Sample Content...")
+                .writer("user00")
+                .build();
+
+        boardDTO.setFileNames(
+                Arrays.asList(
+                        UUID.randomUUID()+"_aaa.jpg",
+                        UUID.randomUUID()+"_bbb.jpg",
+                        UUID.randomUUID()+"_bbb.jpg"
+                ));
+
+        Long bno = boardService.register(boardDTO);
+
+        log.info("bno: " + bno);
+    }
+
+    @Test
+    public void testReadAll(){
+
+        Long bno = 99L;
+
+        BoardDTO boardDTO = boardService.readOne(bno);
+
+        log.info(boardDTO);
+
+        for(String fileName : boardDTO.getFileNames()){
+            log.info(fileName);
+        }
+
+
+    }
+
+    @Test
+    public void testListWithAll() {
+
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+                .page(1)
+                .size(10)
+                .build();
+
+        PageResponseDTO<BoardListAllDTO> responseDTO =
+                boardService.listWithAll(pageRequestDTO);
+
+        List<BoardListAllDTO> dtoList = responseDTO.getDtoList();
+
+        dtoList.forEach(boardListAllDTO -> {
+            log.info(boardListAllDTO.getBno()+":"+boardListAllDTO.getTitle());
+
+            if(boardListAllDTO.getBoardImages() != null) {
+                for (BoardImageDTO boardImage : boardListAllDTO.getBoardImages()) {
+                    log.info(boardImage);
+                }
+            }
+
+            log.info("-------------------------------");
+        });
     }
 
 

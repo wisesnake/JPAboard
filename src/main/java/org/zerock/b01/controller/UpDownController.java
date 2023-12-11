@@ -76,23 +76,22 @@ public class UpDownController {
         return null;
     }
 
-    @ApiOperation(value = "view 파일", notes = "GET 방식 첨부파일 조회")
+    @ApiOperation(value = "view 파일", notes = "GET방식으로 첨부파일 조회")
     @GetMapping("/view/{fileName}")
-    public ResponseEntity<Resource> viewFileGET(@PathVariable String fileName) {
+    public ResponseEntity<Resource> viewFileGET(@PathVariable String fileName){
 
-        Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
-
+        Resource resource = new FileSystemResource(uploadPath+File.separator + fileName);
         String resourceName = resource.getFilename();
         HttpHeaders headers = new HttpHeaders();
 
-        try {
-            headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
-
-        } catch (Exception e) {
+        try{
+            headers.add("Content-Type", Files.probeContentType( resource.getFile().toPath() ));
+        } catch(Exception e){
             return ResponseEntity.internalServerError().build();
         }
         return ResponseEntity.ok().headers(headers).body(resource);
     }
+
 
 
     @ApiOperation(value = "remove 파일", notes = "DELETE 방식으로 파일 삭제")

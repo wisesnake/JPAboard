@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.zerock.b01.domain.BoardImage;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -30,4 +33,8 @@ public class BoardDTO {
     private LocalDateTime regDate;
 
     private LocalDateTime modDate;
+
+    //첨부파일 이름.
+    private List<String> fileNames;
+
 }

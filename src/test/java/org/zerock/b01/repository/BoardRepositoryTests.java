@@ -197,7 +197,7 @@ public class BoardRepositoryTests {
     // 같이 로딩해야 하는 속성을 명시할 수도 있음.
     public void testReadWithImages() {
 //        Optional<Board> result = boardRepository.findById(1L);
-        Optional<Board> result = boardRepository.findByIdWithImage(1L);
+        Optional<Board> result = boardRepository.findByIdWithImages(1L);
         Board board = result.orElseThrow();
 
         log.info(board);
@@ -210,19 +210,16 @@ public class BoardRepositoryTests {
     @Commit
     @Transactional
     public void testModifyImages() {
+                Optional<Board> result = boardRepository.findByIdWithImages(1L);
 
-        Optional<Board> result = boardRepository.findByIdWithImage(1L);
+                Board board = result.orElseThrow();
 
-        Board board = result.orElseThrow();
+                board.clearImages();
 
-        board.clearImages();
-
-        for (int i = 0; i < 2; i++) {
-            board.addImage(UUID.randomUUID().toString(), "updatedfile" + i + ".jpg");
-        }
-
-        boardRepository.save(board);
-
+                for (int i = 0; i < 2; i++) {
+                    board.addImage(UUID.randomUUID().toString(), "updatedfile" + i + ".jpg");
+                }
+                boardRepository.save(board);
     }
 
     @Test

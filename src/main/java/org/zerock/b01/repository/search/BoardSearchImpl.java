@@ -165,10 +165,34 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
         QReply reply = QReply.reply;
 
         JPQLQuery<Board> boardJPQLQuery = from(board);
-        boardJPQLQuery.leftJoin(reply).on(reply.board.eq(board)); // left join
-        //위의 메소드를 나타내보자면 reply left join on reply.board = board 인가?
+        boardJPQLQuery.leftJoin(reply).on(reply.board.eq(board)); //left join
 
-        getQuerydsl().applyPagination(pageable, boardJPQLQuery); // paging
+        if( (types != null && types.length > 0) && keyword != null ){
+
+            BooleanBuilder booleanBuilder = new BooleanBuilder(); // (
+
+            for(String type: types){
+
+                switch (type){
+                    case "t":
+                        booleanBuilder.or(board.title.contains(keyword));
+                        break;
+                    case "c":
+                        booleanBuilder.or(board.content.contains(keyword));
+                        break;
+                    case "w":
+                        booleanBuilder.or(board.writer.contains(keyword));
+                        break;
+                }
+            }//end for
+            boardJPQLQuery.where(booleanBuilder);
+        }
+
+        boardJPQLQuery.groupBy(board);
+
+        getQuerydsl().applyPagination(pageable, boardJPQLQuery); //paging
+
+
 
         JPQLQuery<Tuple> tupleJPQLQuery = boardJPQLQuery.select(board, reply.countDistinct());
 
@@ -177,8 +201,7 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
         List<BoardListAllDTO> dtoList = tupleList.stream().map(tuple -> {
 
             Board board1 = (Board) tuple.get(board);
-
-            long replyCount = tuple.get(1, Long.class);
+            long replyCount = tuple.get(1,Long.class);
 
             BoardListAllDTO dto = BoardListAllDTO.builder()
                     .bno(board1.getBno())
@@ -188,9 +211,10 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
                     .replyCount(replyCount)
                     .build();
 
+            //BoardImage를 BoardImageDTO 처리할 부분
             List<BoardImageDTO> imageDTOS = board1.getImageSet().stream().sorted()
                     .map(boardImage -> BoardImageDTO.builder()
-                            .uuid(boardImage.getFileName())
+                            .uuid(boardImage.getUuid())
                             .fileName(boardImage.getFileName())
                             .ord(boardImage.getOrd())
                             .build()
@@ -198,11 +222,12 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
 
             dto.setBoardImages(imageDTOS);
 
-
             return dto;
         }).collect(Collectors.toList());
 
         long totalCount = boardJPQLQuery.fetchCount();
+
+
         return new PageImpl<>(dtoList, pageable, totalCount);
     }
 }
