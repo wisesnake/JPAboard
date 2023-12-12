@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,7 +46,15 @@ public class BoardController {
         model.addAttribute("responseDTO", responseDTO);
 
     }
-
+    @PreAuthorize("hasRole('USER')")
+    //CustomUserDetailsService 에, 예시 user 에 대해서 로그인 시 authorities("ROLE_USER")라는 인가를 가지도록 코드가 작성되어 있으므로,
+    //hasRole('USER') 라는 표현식 값은 TRUE 가 되면서 인가가 됨.
+    //pre/postAuthorize() 에 들어가는 문자열의 표현식 ->
+    // authenticated() : 인증 된 사용자들만 허용
+    // permitAll() : 모두 허용
+    // anonymouse() : 익명의 사용자 허용
+    // hasRole(표현식) : 표현식 부분의 권한이 있는 사용자 허용
+    // hasAnyRole(표현식) : 여러 권한들 중, 표현식 부분의 하나만 존재해도 허용
     @GetMapping("/register")
     public void registerGET(){
 

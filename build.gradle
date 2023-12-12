@@ -67,6 +67,9 @@ dependencies {
     //썸네일
     implementation 'net.coobird:thumbnailator:0.4.8'
 
+    //스프링 시큐리티
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
 }
 
 tasks.named('test') {
