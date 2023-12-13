@@ -10,6 +10,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Log4j2
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -28,12 +31,28 @@ public class CustomUserDetailsService implements UserDetailsService {
         //스프링 시큐리티에서는 해당 타입의 객체를 이용해서 패스워드를 검사하고, 사용자 권한을 확인하는 방식으로 동작함.
         log.info("loadUserByUsername : " + username);
 
+        List<UserDetails> users = new ArrayList<>();
+
         UserDetails userDetails = User.builder()
                 .username("user1")
                 .password(passwordEncoder.encode("1111")) // 패스워드 인코딩.
                 .authorities("ROLE_USER")
                 .build();
 
-        return userDetails;
+        users.add(userDetails);
+
+        UserDetails user2Details = User.builder()
+                .username("user2")
+                .password(passwordEncoder.encode("1111")) // 패스워드 인코딩.
+                .authorities("ROLE_USER")
+                .build();
+        users.add(user2Details);
+
+        for (UserDetails user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        throw new UsernameNotFoundException("User not found with username: " + username);
     }
 }

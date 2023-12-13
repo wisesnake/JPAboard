@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -56,8 +57,8 @@ public class BoardController {
     // hasRole(표현식) : 표현식 부분의 권한이 있는 사용자 허용
     // hasAnyRole(표현식) : 여러 권한들 중, 표현식 부분의 하나만 존재해도 허용
     @GetMapping("/register")
-    public void registerGET(){
-
+    public void registerGET(Model model){
+        model.addAttribute("authentication", SecurityContextHolder.getContext().getAuthentication());
     }
 
     @PostMapping("/register")
@@ -92,7 +93,8 @@ public class BoardController {
 //
 //    }
 
-
+    //해당 요청은 로그인한 사용자만 가능함.
+    @PreAuthorize("isAuthenticated()")
     @GetMapping({"/read", "/modify"})
     public void read(Long bno, PageRequestDTO pageRequestDTO, Model model){
 
@@ -104,6 +106,8 @@ public class BoardController {
 
     }
 
+    //해당 boardDTO 의 writer 필드값과, 로그인된 사용자의 아이디가 일치하는지를 메소드 실행 전에 확인.
+    @PreAuthorize("principal.username == #boardDTO.writer")
     @PostMapping("/modify")
     public String modify( PageRequestDTO pageRequestDTO,
                           @Valid BoardDTO boardDTO,
@@ -134,6 +138,7 @@ public class BoardController {
     }
 
 
+    @PreAuthorize("principal.username == #boardDTO.writer")
     @PostMapping("/remove")
     public String remove(BoardDTO boardDTO, RedirectAttributes redirectAttributes) {
 
