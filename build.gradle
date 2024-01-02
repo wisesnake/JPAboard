@@ -5,13 +5,11 @@ buildscript {
     }
 }
 
-
-
-
 plugins {
     id 'org.springframework.boot' version '2.7.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'war'
 }
 
 group = 'org.zerock'
@@ -51,7 +49,9 @@ dependencies {
 
             "javax.annotation:javax.annotation-api",
 
-            "com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
+            "com.querydsl:querydsl-apt:${queryDslVersion}:jpa"
+
+    )
 
 
     implementation 'org.modelmapper:modelmapper:3.1.0'
@@ -71,6 +71,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     //스프링 시큐리티 Thymeleaf
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    //OAuth2 Client
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
 }
 
@@ -85,3 +87,4 @@ sourceSets {
         }
     }
 }
+

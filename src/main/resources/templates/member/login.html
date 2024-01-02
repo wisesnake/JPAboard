@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
     <meta charset="utf-8" />
@@ -21,7 +22,8 @@
         </div>
         <div class="card-body">
             <th:block th:if="${param.logout != null}">
-                <h1>Logout........</h1>
+                <h1>로그아웃 되었습니다.</h1>
+                <button class="btn btn-primary" onclick="toHome()">Home</button>
             </th:block>
 
             <form id="registerForm" action="/member/login" method="post" th:if="${param.logout == null}">
@@ -36,17 +38,33 @@
                 <div class="input-group mb-3 ">
                     <input class="form-check-input" type="checkbox" name="remember-me">
                     <label class="form-check-label">
-                        자동 로그인
+                         자동 로그인
                     </label>
                 </div>
                 <div class="my-4">
                     <div class="float-end">
-                        <button type="submit" class="btn btn-primary submitBtn">LOGIN</button>
+                        <button type="submit" class="float-end btn btn-primary submitBtn">LOGIN</button></br></br>
+                        <button type="button" class="btn btn-succes signupBtn">SIGN UP</button>
                     </div>
                 </div>
             </form>
         </div><!--end card body-->
     </div><!--end card-->
 </div>
+<script layout:fragment="script" th:inline="javascript">
+
+
+    document.querySelector(".signupBtn").addEventListener("click",function(e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/member/join'
+    })
+
+    function toHome(){
+        self.location = '/board/list'
+    }
+
+</script>
 </body>
 </html>
